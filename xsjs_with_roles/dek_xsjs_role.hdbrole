@@ -1,0 +1,4 @@
+role test.dek.xsjs_with_roles::dek_xsjs_role
+{
+	application privilege: test.dek.xsjs_with_roles::dek_priv_A; 
+}

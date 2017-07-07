@@ -1,0 +1,9 @@
+import = [
+            {
+                table  = "test.dek.dataloader.model::customizing.FIELDS";
+                schema = "S0016140232";
+                file   = "test.dek.dataloader.model:testData.csv"; 
+                header = false;
+                delimField = "*";
+            }
+         ];

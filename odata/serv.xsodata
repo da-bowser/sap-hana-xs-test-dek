@@ -1,0 +1,7 @@
+service  { 
+    entity "S0016140232"."test.dek.dataloader.model::customizing.FIELDS" 			as "FIELDS";
+    entity "S0016140232"."test.dek.dataloader.model::customizing.FIELD_TYPES" 		as "FIELD_TYPES";
+    entity "S0016140232"."test.dek.dataloader.model::customizing.DATA_MAPPING"		as "DATA_MAPPING";
+    entity "S0016140232"."test.dek.dataloader.model::customizing.MATCH_METHOD"		as "MATH_METHOD";
+    entity "S0016140232"."test.dek.dataloader.model::customizing.VALUE_MAPPING"	as "VALUE_MAPPING";
+}

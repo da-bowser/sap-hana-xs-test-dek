@@ -1,0 +1,11 @@
+{
+    "description": "DEK: Job",
+    "action": "test.dek.job:jobLogic.xsjs::main",
+    "schedules": [
+       {
+          "description": "My job description",
+          "signature_version": 1,
+          "xscron": "* * * * * * 59"
+       }
+    ]
+}

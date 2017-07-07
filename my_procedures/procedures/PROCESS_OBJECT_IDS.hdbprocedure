@@ -1,0 +1,74 @@
+PROCEDURE "S0016140232"."test.dek.my_procedures.procedures::PROCESS_OBJECT_IDS" ( 
+    IN iv_source_system_id      NVARCHAR(49),
+    OUT ov_eval_total           INTEGER,
+    OUT ov_insert_count         INTEGER
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   DEFAULT SCHEMA S0016140232 AS
+BEGIN
+   
+   -- Constants
+   DECLARE lv_batch_size        CONSTANT    INTEGER     := '10000';
+   
+   -- Variables
+   DECLARE lv_object_id_count               INTEGER;
+   DECLARE lv_counter                       INTEGER     := 0;
+   DECLARE lv_offset                        INTEGER     := 0;
+ 
+   
+/*=====================================================================================
+ ******** Prepare
+ *=====================================================================================*/	
+	-- Initialize output variables
+    ov_eval_total       = 0;       
+    ov_insert_count     = 0;
+  
+    -- Get unique object id's in master data
+    SELECT COUNT(DISTINCT "source_system_id", "object_id") INTO lv_object_id_count
+    FROM "DQG"."dk.it.dqg.engine.dataTransformer.model::transaction.MASTER_DATA"
+    WHERE
+        "source_system_id" = :iv_source_system_id;
+
+    -- Get field ids
+    FIELD_IDS =     SELECT DISTINCT A."field_id"
+                    FROM "DQG"."dk.it.dqg.engine.dataTransformer.model::customizing.FIELDS" A
+                    INNER JOIN "DQG"."dk.it.dqg.engine.dataTransformer.model::customizing.DATA_MAPPING" B
+                        ON A."field_id" = B."target_field_ref.field_id"
+                    WHERE
+                            B."source_system_id" = :iv_source_system_id
+                        AND B."exclude" = 'N';
+
+
+/*=====================================================================================
+ ******** Process object id's
+ *=====================================================================================*/
+    WHILE (lv_counter <= lv_object_id_count) DO
+        -- Local variables
+        DECLARE lv_eval_total           INTEGER;
+        DECLARE lv_insert_count         INTEGER;
+        
+        -- Get current batch
+        CURRENT_BATCH = SELECT DISTINCT "object_id"
+                        FROM "DQG"."dk.it.dqg.engine.dataTransformer.model::transaction.MASTER_DATA"
+                        WHERE  
+                            "source_system_id" = :iv_source_system_id
+                        ORDER BY "object_id" ASC
+                        LIMIT :lv_batch_size OFFSET :lv_offset;
+                        
+        -- Process current batch
+        CALL "S0016140232"."test.dek.my_procedures.procedures::HANDLE_INSERT_FIELDS"(:CURRENT_BATCH, :FIELD_IDS, iv_source_system_id, '##DQG_NULL_VAL##', lv_insert_count);
+        
+        -- Increment output counters
+        ov_insert_count = ov_insert_count   + lv_insert_count;
+        
+        -- Increment offset
+        lv_offset = lv_offset + lv_batch_size;
+
+        -- Increment loop counter
+        lv_counter = lv_counter + 1;
+    END WHILE;
+    
+    ov_eval_total = lv_object_id_count;
+
+END

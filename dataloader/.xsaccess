@@ -1,0 +1,9 @@
+{
+	"exposed" : true,
+	"authentication" : {"method": "Basic"},
+	"authorization":
+ 	[
+ 		"test.dek.dataloader::Execute",
+ 		"test.dek.dataloader::Admin"
+ 	]
+}

@@ -1,0 +1,40 @@
+namespace test.dek.dataloader.model;
+using test.dek.dataloader.model::customizing.FIELDS;
+using test.dek.dataloader.model::customizing.FIELD_TYPES;
+
+@Schema: 'S0016140232'
+context transaction {
+
+
+    /* Transactional table.
+     * Contains master data from source systems loaded into system.
+     */
+	@Catalog.tableType: #COLUMN
+    entity MASTER_DATA {
+        key source_system_id 	: String(40) not null;									// Id of source system where field originates from 
+        key object_id 			: String(40) not null;									// Object id (typically EmployeeId)
+        key field_id_ref 		: Association[1] to FIELDS { field_id } not null;		// Ref to internal field
+        key start_date 			: LocalDate not null;									// Validity, start date
+        end_date				: LocalDate not null;									// Validity, end date
+		field_type_ref			: Association[1] to FIELD_TYPES;						// Ref to field type
+		value					: String(80) not null;									// Field value
+		changed					: Boolean default false not null;						// Change pointer flag
+    };
+
+
+    /* Transactional table.
+     * List of errors occuring or found during Data Loading background job.
+     */
+	@Catalog.tableType: #COLUMN
+    entity DATA_LOADER_ERRORS {
+        key source_system_id 	: String(40) not null;									// Id of source system where field originates from 
+        key source_entity 		: String(150) not null;									// Source entity / file name
+        error					: String(1024) not null;								// Error
+        errorLocation			: String(2112);											// Error location
+        timstamp				: UTCDateTime not null;									// Timestamp of error (occured or discovered)
+        errorReported			: String(1) not null default 'N';						// Flag indicating if error been reported
+        errorReportedTimes		: Integer;												// Number of times error is reported
+    };
+
+
+};

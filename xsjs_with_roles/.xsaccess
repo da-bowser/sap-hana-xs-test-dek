@@ -1,0 +1,15 @@
+{
+	"exposed" : true,
+	"authentication" : {"method": "Form"},
+	"authorization" :
+        [   "test.dek.xsjs_with_roles::dek_priv_A",
+            "test.dek.xsjs_with_roles::dek_priv_B"
+        ],
+	"force_ssl" : true,
+	"prevent_xsrf" : true,
+	"cors" :
+            {
+                "enabled" : false
+            },
+    "cache_control" :  "no-cache, no-store"
+}

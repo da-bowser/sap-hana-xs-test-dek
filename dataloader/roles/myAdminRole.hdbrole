@@ -1,0 +1,9 @@
+role test.dek.dataloader.roles::myAdminRole
+{
+
+//catalog sql object "S0016140232"."test.dek.dataloader.model::Load.LoadTable":
+//	SELECT;
+
+application privilege: "test.dek.dataloader::Admin";
+
+}

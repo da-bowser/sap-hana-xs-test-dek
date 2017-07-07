@@ -1,0 +1,97 @@
+namespace test.dek.dataloader.model;
+
+@Schema: 'S0016140232'
+context customizing {
+
+
+    /* Customizing table.
+     * Contains fields known internally.
+     */
+	@Catalog.tableType: #COLUMN
+    entity FIELDS {
+        key field_id 			: String(40) not null;						// Field id, internal
+        label		 			: String(40) not null;						// Field label
+        description				: String(100);								// Field description
+		field_type				: Association[1] to FIELD_TYPES;			// Field type (Employee, Job, Position, ...)
+		purge_flag				: String(1)	not null default 'N'; 			// Purge flag indicates if field is deletable in Master Data table. nb: Boolean is not supported by odata service and data import from excel...
+	};
+
+     
+    
+    /* Customizing table.
+     * Contains mapping from external, source systems to internal Master Data table.
+     */
+	@Catalog.tableType: #COLUMN
+    entity DATA_MAPPING {
+        key source_system_id	: String(40) not null;						// Id of source system where field originates from 
+        key source_field		: String(80) not null;						// Name of source field
+        source_object_id		: String(40);								// Name of source field containing records object ID 
+		match_method			: Association[1] to MATCH_METHOD;			// Determine how to map source_object_id to target_field
+		target_field_ref		: Association[1] to FIELDS { field_id };	// Reference to target field
+	};
+    
+
+    
+    /* Customizing table.
+     * Contains a list of field types supported 
+     * 	- for instance: employee, position, department, job, etc..
+     */
+    @Catalog.tableType: #COLUMN
+    entity FIELD_TYPES {
+        key name 		: String(20);
+        description 	: String(50);
+    };
+    
+
+
+    /* Customizing table.
+     * List of Match Methods. A match method represents a way of mapping a source field to a target field.
+     * Examples could be: 1:1, Value Mapping, etc..
+     */
+    @Catalog.tableType: #COLUMN
+    entity MATCH_METHOD {
+        key name 		: String(100)  not null;
+        description 	: String(50);
+    };
+
+    
+    
+    /* Customizing table.
+     * Value mapping table for external field values to existing/internal values. 
+     */
+    @Catalog.tableType: #COLUMN
+    entity VALUE_MAPPING {
+        key source_system_id 	: String(40) not null;							// Id of source system where field originates from 
+        key source_field_name	: String(20) not null;							// Source field name (= Object id in a source system)
+//        target_system_id		: String
+        target_field_name		: Association[1] to FIELDS { field_id };		// Field name being mapped to
+        target_field_value		: String(20) not null;							// Result value
+    };
+
+
+    /* Customizing table.
+     * Contains a list of source tables (entities) to be read and mapped to Master Data table during data loading. 
+     */
+	@Catalog.tableType: #COLUMN
+    entity DATA_LOAD_ENTITY_CONFIG {
+        key source_system_id 	: String(40) not null;							// Id of source system where field originates from
+        key table_name 			: String(100) not null;							// Native hana table to load data from
+        last_read				: UTCDateTime;									// Timestamp for last processing of source table 
+        last_read_file_name		: String(1024);									// Name of file last read (used to avoid dublicates)
+	};
+
+
+    /* Customizing table.
+     * Contains a list of source fields/columns to be skipped during processing in the Data Loader. 
+     */
+	@Catalog.tableType: #COLUMN
+    entity DATA_LOAD_COLUMN_SKIP {
+        key source_system_id 	: String(40) not null;							// Id of source system where field originates from
+        key source_field_name	: String(20) not null;							// Source field name (= Object id in a source system)
+        reason					: String(40) not null;							// Reason for skipping field
+	};
+
+
+
+
+};

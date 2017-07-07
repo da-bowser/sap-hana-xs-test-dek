@@ -1,0 +1,71 @@
+PROCEDURE "S0016140232"."test.dek.my_procedures::APPLY_FILTER" ( 
+    
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   DEFAULT SCHEMA "S0016140232" AS
+BEGIN
+
+
+    DECLARE lt_field        TABLE ("field_id"   NVARCHAR(40));
+    DECLARE lt_sample_space TABLE ("object_id"  NVARCHAR(40));
+
+    DECLARE la_fields       NVARCHAR(80) ARRAY;
+    DECLARE la_object_id    NVARCHAR(40) ARRAY;
+    declare lv_field_count  integer;
+    declare lv_counter      integer := 1;
+    
+    declare lv_sql          NVARCHAR(200);
+    
+    la_fields[1] = 'F0001';
+    la_fields[2] = 'F0002';
+    la_fields[3] = 'F0003';
+    
+    la_object_id[1] = '00001';
+    la_object_id[2] = '00002';
+    la_object_id[3] = '00003';
+    la_object_id[4] = '00004';
+    la_object_id[5] = '00005';
+    la_object_id[6] = '30085';
+    la_object_id[7] = 'testUK05';
+
+    lt_field        = UNNEST(:la_fields)    as ("field_id");
+    lt_sample_space = UNNEST(:la_object_id) as ("object_id");
+
+
+/*=====================================================================================
+ ******** Test 1: apply filter with sub-query
+ *=====================================================================================*/
+    -- Below does not work runtime, since sub-query is not allowed in APPLY_FILTER.
+    lv_sql = '"object_id" in (select object_id from "DQG"."DUMMY_TEST_2")';
+    --DEK = APPLY_FILTER("DQG"."dk.it.dqg.dataTransformer.model::transaction.MASTER_DATA", :lv_sql);
+
+
+/*=====================================================================================
+ ******** Test 2: apply filter on internal table
+ *=====================================================================================*/
+ /*
+    -- Get copy of Master Data for current Sample Space
+    INITIAL_MAST =  SELECT  A."object_id", 
+                        A."field_id" 
+                    FROM "DQG"."dk.it.dqg.rulesEngine.model::view.MASTER_DATA_FILTER" A
+                    INNER JOIN :lt_sample_space B
+                        ON A."object_id" = B."object_id";
+                    
+    -- Create dynamic filter sql
+    lv_sql = '"object_id" = ''30085''';
+    
+    -- Get reduced set of Master Data
+    NEW_MAST_RESULT = APPLY_FILTER(:INITIAL_MAST, :lv_sql);
+    
+    -- Get unique object_ids from Master Data
+    NEW_SAMPLE_SPACE = SELECT DISTINCT "object_id" FROM :NEW_MAST_RESULT ORDER BY "object_id" ASC;
+*/
+
+/*=====================================================================================
+ ******** Dummy stuff
+ *=====================================================================================*/
+    if 1 = 2 then
+    end if;
+
+END

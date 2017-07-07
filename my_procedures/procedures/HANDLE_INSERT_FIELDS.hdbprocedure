@@ -1,0 +1,64 @@
+PROCEDURE "S0016140232"."test.dek.my_procedures.procedures::HANDLE_INSERT_FIELDS" ( 
+    IN it_object_ids            "DQG"."dk.it.dqg.engine.rules.model::types.object_ids",
+    IN it_fields                "DQG"."dk.it.dqg.engine.rules.model::types.field_ids",
+    IN iv_source_system_id      NVARCHAR(40),
+    IN iv_param_null_value      NVARCHAR(80),
+    OUT ov_insert_count         INTEGER
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   DEFAULT SCHEMA DQG AS
+BEGIN
+
+/*=====================================================================================
+ ******** Prepare
+ *=====================================================================================*/	
+    ov_insert_count = 0;
+
+   
+/*=====================================================================================
+ ******** Get missing fields
+ *=====================================================================================*/
+    MASTER_DATA_FIELDS =    SELECT distinct "object_id", "field_id_ref.field_id"
+                            FROM "DQG"."dk.it.dqg.engine.dataTransformer.model::transaction.MASTER_DATA"
+                            WHERE 
+                                "source_system_id" = :iv_source_system_id
+                            AND "object_id" IN ( SELECT "object_id" from :it_object_ids);
+ 
+ 
+   MISSING_FIELDS = SELECT DISTINCT C."object_id", A."field_id"
+                    FROM :it_fields A
+                    CROSS JOIN :it_object_ids C
+                    WHERE C."object_id" IN ( SELECT "object_id" from :it_object_ids )
+                        EXCEPT
+                    SELECT "object_id", "field_id_ref.field_id"
+                    FROM :MASTER_DATA_FIELDS;
+
+
+/*=====================================================================================
+ ******** Insert missing fields to master data table
+ *=====================================================================================*/
+    INSERT INTO "DQG"."dk.it.dqg.engine.dataTransformer.model::transaction.MASTER_DATA" 
+    ("source_system_id", "object_id", "field_id_ref.field_id", "start_date", "end_date", "value", "changed", "last_changed", "last_changed_by", "sys_last_changed", "sys_last_changed_by")
+    SELECT
+        :iv_source_system_id,
+        "object_id", 
+        "field_id", 
+        CURRENT_DATE, 
+        '9999-12-31', 
+        :iv_param_null_value, 
+        'Y', 
+        NOW(), 
+        'DQG_SYS_FN', 
+        NOW(),
+        'DQG_SYS_FN'
+    FROM :MISSING_FIELDS;
+
+ 
+/*=====================================================================================
+ ******** Set output
+ *=====================================================================================*/
+    ov_insert_count = ::ROWCOUNT;
+    COMMIT;
+ 
+END

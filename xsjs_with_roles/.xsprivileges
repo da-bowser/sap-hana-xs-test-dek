@@ -1,0 +1,8 @@
+{
+ "privileges" :
+ [
+	{ "name" : "dek_priv_A", "description" : "Basic execution privilege" },
+	{ "name" : "dek_priv_B", "description" : "Administration privilege" }
+ ]
+}
+

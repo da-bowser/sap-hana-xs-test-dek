@@ -1,0 +1,5 @@
+service namespace "test.dek" {  
+
+    entity "dk.it.dqg.engine.dataTransformer.model::transaction.MASTER_DATA" as "HE";
+
+}

@@ -1,0 +1,16 @@
+PROCEDURE "S0016140232"."test.dek.my_procedures::years_between" ( 
+    OUT ot_result   TABLE(tst NVARCHAR(80))
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   DEFAULT SCHEMA S0016140232 AS
+BEGIN
+
+
+	ot_result = select 
+	                (YEARS_BETWEEN(TO_DATE(VAL), CURRENT_DATE)) as tst
+	            from "S0016140232"."TST_TAB"
+	            where 
+	                (YEARS_BETWEEN(TO_DATE(VAL), CURRENT_DATE)) > 5;
+
+END

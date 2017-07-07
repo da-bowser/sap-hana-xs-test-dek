@@ -1,0 +1,5 @@
+role test.dek.dataloader.roles::myExecuteRole {
+
+	application privilege: test.dek.dataloader::Execute;
+
+}

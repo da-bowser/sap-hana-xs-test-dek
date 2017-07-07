@@ -1,0 +1,21 @@
+namespace test.dek.dataloader.model;
+using test.dek.dataloader.model::transaction.MASTER_DATA as T_MAST;
+
+@Schema: 'S0016140232'
+context view {
+
+	view MASTER_DATA AS SELECT FROM T_MAST {
+        source_system_id,
+        object_id,
+		field_id_ref.field_id			as field_id,
+        field_id_ref.label				as field_id_label,
+        field_id_ref.field_type.name 	as field_id_name,
+        start_date,
+        end_date,
+        field_type_ref.name				as field_type_name,
+        field_type_ref.description		as field_type_descr,	
+        value,
+        changed
+    };
+
+};

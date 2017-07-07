@@ -1,0 +1,8 @@
+schema= "S0016140232";
+start_with= 10;
+maxvalue= 30;
+nomaxvalue=false;
+minvalue= 1;
+nominvalue=true;
+cycles= false;
+
